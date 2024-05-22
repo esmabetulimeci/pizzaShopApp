@@ -35,5 +35,16 @@ namespace Domain.Model
         {
             return new ProductAggregate(name, description, price, ingredients, quantity);
         }
+
+        public void Update(string name, string description, double price, List<Ingredients> ingredients, double quantity)
+        {
+            Name = name;
+            Description = description;
+            Price = price;
+            Ingredients = ingredients;
+            Quantity = quantity;
+        }
+
+
     }
 }
