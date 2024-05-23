@@ -11,12 +11,10 @@ namespace pizzaShopApi.Models.Product
         public List<Ingredients> Ingredients { get; set; }
         public double Quantity { get; set; }
 
-        //public UpdateProductCommand ToCommand()
-        //{
-        //    return new UpdateProductCommand
-        //    (
-        //       Name, Description, Price, Ingredients, Quantity
-        //    );
-        //}
+
+        public UpdateProductCommand ToCommand(int id)
+        {
+            return new UpdateProductCommand(id, Name, Description, Price, Ingredients, Quantity);
+        }
     }
 }

@@ -32,5 +32,21 @@ namespace pizzaShopApi.Controllers
             var result = await _mediator.Send(new GetProductQuery());
             return Ok(result);
         }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var result = await _mediator.Send(new GetProductByIdQuery(id));
+            return Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPut("id")]
+        public async Task<IActionResult> Update (int id, [FromBody] UpdateProductRequest request)
+        {
+            var result = await _mediator.Send(request.ToCommand(id));
+            return Ok(result);
+        }
     }
 }

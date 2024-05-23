@@ -12,7 +12,6 @@ namespace Application.Product.Queries
 {
     public class GetProductQuery : IRequest<IEnumerable<ProductAggregate>>
     {
-
         public class Handler : IRequestHandler<GetProductQuery, IEnumerable<ProductAggregate>>
         {
             private readonly IPizzaShopAppDbContext _dbContext;
