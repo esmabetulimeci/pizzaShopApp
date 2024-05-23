@@ -1,4 +1,5 @@
-﻿using Application.Product.Queries;
+﻿using Application.Product.Commands;
+using Application.Product.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,14 @@ namespace pizzaShopApi.Controllers
         public async Task<IActionResult> Update (int id, [FromBody] UpdateProductRequest request)
         {
             var result = await _mediator.Send(request.ToCommand(id));
+            return Ok();
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _mediator.Send(new DeleteProductCommand(id));
             return Ok(result);
         }
     }

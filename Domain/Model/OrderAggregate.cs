@@ -15,5 +15,51 @@ namespace Domain.Model
         public DateTime OrderDate { get; set; }
         public string CustomerName { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
+
+        public OrderAggregate()
+        {
+            // only db
+        }
+
+        private OrderAggregate(string orderNumber, double totalAmount, double discountAmount, DateTime orderDate, string customerName, List<ProductAggregate> products)
+        {
+            OrderNumber = GenerateOrderNumber();
+            TotalAmount = totalAmount;
+            DiscountAmount = discountAmount;
+            OrderDate = DateTime.Now;
+            CustomerName = customerName;
+            Products = products;
+        }
+
+        public static OrderAggregate Create(string customerName, List<ProductAggregate> products)
+        {
+           
+            string orderNumber = GenerateOrderNumber();
+
+          
+            double totalAmount = products.Sum(p => p.Price);
+
+          
+            return new OrderAggregate(orderNumber, totalAmount, 0, DateTime.Now, customerName, products);
+        }
+
+        private static string GenerateOrderNumber() 
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, 8)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+      
+
+
+
+
+
     }
+
+
+
+
 }

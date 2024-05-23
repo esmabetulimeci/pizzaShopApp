@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Model
@@ -28,6 +29,7 @@ namespace Domain.Model
         public double Price { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<Ingredients> Ingredients { get; set; }
+        [JsonIgnore]
         public double Quantity { get; set; }
         public virtual List<OrderAggregate> Orders { get; set; }
 
