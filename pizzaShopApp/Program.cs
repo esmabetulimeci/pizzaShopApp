@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Infrastructure;
+using Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<IPizzaShopAppDbContext, PizzaShopAppDbContext>();
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(IPizzaShopAppDbContext).Assembly));
 builder.Services.AddControllers().AddJsonOptions(options =>
 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+builder.Services.AddSingleton<TcmbService>();
+builder.Services.AddHttpClient<TcmbService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

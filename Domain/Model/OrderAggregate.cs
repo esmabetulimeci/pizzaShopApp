@@ -54,16 +54,13 @@ namespace Domain.Model
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public void Update(string newCustomerName, List<ProductAggregate> newProducts)
+       
+        public void Update(string customerName, List<ProductAggregate> products)
         {
-
-            CustomerName = newCustomerName;
-            Products = newProducts;
-            TotalAmount = newProducts.Sum(p => p.Price);
-            OrderDate = DateTime.Now;
-
-            // _dbContext.SaveChanges();
+            CustomerName = customerName;
+            Products = products;
         }
+
 
 
 
