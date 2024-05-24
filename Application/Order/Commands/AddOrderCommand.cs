@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Model;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,12 @@ namespace Application.Order.Commands
     public class AddOrderCommand : IRequest<OrderAggregate>
     {
         public string CustomerName { get; set; }
-        public int ProductId { get; set; }
+        public List<int> ProductIds { get; set; }
 
-        public AddOrderCommand(string customerName, int productId)
+        public AddOrderCommand(string customerName, List<int> productIds)
         {
             CustomerName = customerName;
-            ProductId = productId;
+            ProductIds = productIds;
         }
 
         public class AddOrderCommandHandler : IRequestHandler<AddOrderCommand, OrderAggregate>
@@ -31,39 +32,32 @@ namespace Application.Order.Commands
 
             public async Task<OrderAggregate> Handle(AddOrderCommand request, CancellationToken cancellationToken)
             {
-             
-                var product = await _dbContext.Products.FindAsync(request.ProductId);
-                if (product == null)
+                var products = await _dbContext.Products.Where(p => request.ProductIds.Contains(p.Id)).ToListAsync();
+                if (products.Count != request.ProductIds.Count)
                 {
-                   
-                    throw new Exception("Product not found");
+                    throw new Exception("One or more products not found");
                 }
 
-                
-                double totalAmount = product.Price;
+                double totalAmount = products.Sum(p => p.Price);
 
-              
                 string orderNumber = GenerateOrderNumber();
 
-             
                 var order = new OrderAggregate
                 {
                     CustomerName = request.CustomerName,
                     TotalAmount = totalAmount,
-                    DiscountAmount = 0, 
-                    OrderDate = DateTime.Now, 
-                    OrderNumber = orderNumber, 
-                    Products = new List<ProductAggregate> { product } 
+                    DiscountAmount = 0,
+                    OrderDate = DateTime.Now,
+                    OrderNumber = orderNumber,
+                    Products = products
                 };
 
-              
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return order;
             }
 
-         
             private string GenerateOrderNumber()
             {
                 const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

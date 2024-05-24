@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Model;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,13 +30,18 @@ namespace Application.Order.Queries
 
             public async Task<OrderAggregate> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
             {
-                var order = await _dbContext.Orders.FindAsync(request.Id);
+                var order = await _dbContext.Orders
+                    .Include(o => o.Products) 
+                    .FirstOrDefaultAsync(o => o.Id == request.Id);
+
                 if (order == null)
                 {
                     throw new Exception("ORDER_NOT_FOUND");
                 }
+
                 return order;
             }
+
         }
     }
 }

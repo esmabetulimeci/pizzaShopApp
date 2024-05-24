@@ -31,6 +31,8 @@ namespace Domain.Model
         public List<Ingredients> Ingredients { get; set; }
         [JsonIgnore]
         public double Quantity { get; set; }
+
+        [JsonIgnore]
         public virtual List<OrderAggregate> Orders { get; set; }
 
         public static ProductAggregate Create(string name, string description, double price, List<Ingredients> ingredients, double quantity)

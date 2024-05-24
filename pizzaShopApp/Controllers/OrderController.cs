@@ -34,6 +34,34 @@ namespace pizzaShopApi.Controllers
             return Ok(orders);
         }
 
+        [HttpGet("{orderId}")]
+
+        public async Task<IActionResult> GetOrder(int orderId)
+        {
+            var order = await _mediator.Send(new GetOrderByIdQuery(orderId));
+            return Ok(order);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrderRequest request)
+        {
+            var command = request.ToCommand();
+            var order = await _mediator.Send(command);
+
+            return Ok(order);
+        }
+
+        [HttpDelete("{orderId}")]
+        public async Task<IActionResult> DeleteOrder(int orderId)
+        {
+            var command = new DeleteOrderCommand(orderId);
+            await _mediator.Send(command);
+
+            return Ok();
+        }
+
+
+
 
 
     }

@@ -6,16 +6,14 @@ namespace pizzaShopApi.Models.Order
     public class CreateOrderRequest
     {
         public string CustomerName { get; set; }
-        public int ProductId { get; set; }
-        public DateTime OrderDate { get; set; }
+        public List<int> ProductIds { get; set; }
+
 
         public AddOrderCommand ToCommand()
         {
-
-            return new AddOrderCommand(CustomerName, ProductId);
+            return new AddOrderCommand(CustomerName, ProductIds);
         }
     }
-
 
 
 }

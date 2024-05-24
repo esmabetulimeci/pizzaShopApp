@@ -33,17 +33,20 @@ namespace Domain.Model
 
         public static OrderAggregate Create(string customerName, List<ProductAggregate> products)
         {
-           
+
             string orderNumber = GenerateOrderNumber();
+            double totalAmount = 0;
+            foreach (var product in products)
+            {
+                totalAmount += product.Price * product.Quantity;
+            }
 
-          
-            double totalAmount = products.Sum(p => p.Price);
-
-          
             return new OrderAggregate(orderNumber, totalAmount, 0, DateTime.Now, customerName, products);
         }
 
-        private static string GenerateOrderNumber() 
+
+
+        private static string GenerateOrderNumber()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             Random random = new Random();
@@ -51,7 +54,16 @@ namespace Domain.Model
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-      
+        public void Update(string newCustomerName, List<ProductAggregate> newProducts)
+        {
+
+            CustomerName = newCustomerName;
+            Products = newProducts;
+            TotalAmount = newProducts.Sum(p => p.Price);
+            OrderDate = DateTime.Now;
+
+            // _dbContext.SaveChanges();
+        }
 
 
 
