@@ -3,8 +3,7 @@ using Domain.Model;
 using MediatR;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Product.Commands
@@ -27,13 +26,11 @@ namespace Application.Product.Commands
 
         public class Handler : IRequestHandler<AddProductCommand, ProductAggregate>
         {
-            private IMediator _mediator;
             private readonly IPizzaShopAppDbContext _dbContext;
 
-            public Handler(IPizzaShopAppDbContext dbContext, IMediator mediator)
+            public Handler(IPizzaShopAppDbContext dbContext)
             {
                 _dbContext = dbContext;
-                _mediator = mediator;
             }
 
             public async Task<ProductAggregate> Handle(AddProductCommand request, CancellationToken cancellationToken)

@@ -24,48 +24,50 @@ namespace Application.Order.Commands
             CustomerAddress = customerAddress;
             ProductIds = productIds;
         }
-    }
 
-    public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderAggregate>
-    {
-        private readonly IPizzaShopAppDbContext _dbContext;
-
-        public UpdateOrderCommandHandler(IPizzaShopAppDbContext dbContext)
+        public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderAggregate>
         {
-            _dbContext = dbContext;
-        }
+            private readonly IPizzaShopAppDbContext _dbContext;
 
-        public async Task<OrderAggregate> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
-        {
-            var order = await _dbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == request.OrderId);
-
-            if (order == null)
+            public UpdateOrderCommandHandler(IPizzaShopAppDbContext dbContext)
             {
-                throw new Exception($"Order with ID {request.OrderId} not found.");
+                _dbContext = dbContext;
             }
 
-           
-            order.CustomerName = request.CustomerName;
-            order.CustomerAddress = request.CustomerAddress;
-
-        
-            order.Products.Clear();
-
-            foreach (var productId in request.ProductIds)
+            public async Task<OrderAggregate> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
             {
-                var product = await _dbContext.Products.FindAsync(productId);
-                if (product == null)
+                var order = await _dbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == request.OrderId);
+
+                if (order == null)
                 {
-                    throw new Exception($"Product with ID {productId} not found.");
+                    throw new Exception($"Order with ID {request.OrderId} not found.");
                 }
-                order.Products.Add(product);
+
+
+                order.CustomerName = request.CustomerName;
+                order.CustomerAddress = request.CustomerAddress;
+
+
+                order.Products.Clear();
+
+                foreach (var productId in request.ProductIds)
+                {
+                    var product = await _dbContext.Products.FindAsync(productId);
+                    if (product == null)
+                    {
+                        throw new Exception($"Product with ID {productId} not found.");
+                    }
+                    order.Products.Add(product);
+                }
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                return order;
             }
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return order;
         }
     }
+
+   
 
 
 
