@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Model
 {
@@ -14,6 +12,7 @@ namespace Domain.Model
         public double DiscountAmount { get; set; }
         public DateTime OrderDate { get; set; }
         public string CustomerName { get; set; }
+        public string CustomerAddress { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
 
         public OrderAggregate()
@@ -21,30 +20,43 @@ namespace Domain.Model
             // only db
         }
 
-        private OrderAggregate(string orderNumber, double totalAmount, double discountAmount, DateTime orderDate, string customerName, List<ProductAggregate> products)
+        private OrderAggregate(string orderNumber, double totalAmount, double discountAmount, DateTime orderDate, string customerName, string customerAddress, List<ProductAggregate> products)
         {
-            OrderNumber = GenerateOrderNumber();
+            OrderNumber = orderNumber;
             TotalAmount = totalAmount;
             DiscountAmount = discountAmount;
-            OrderDate = DateTime.Now;
+            OrderDate = orderDate;
             CustomerName = customerName;
+            CustomerAddress = customerAddress;
             Products = products;
         }
 
-        public static OrderAggregate Create(string customerName, List<ProductAggregate> products)
+        public static OrderAggregate Create(string customerName, string customerAddress, List<ProductAggregate> products)
         {
-
             string orderNumber = GenerateOrderNumber();
-            double totalAmount = 0;
-            foreach (var product in products)
-            {
-                totalAmount += product.Price * product.Quantity;
-            }
+            double totalAmount = products.Sum(product => product.Price * product.Quantity);
 
-            return new OrderAggregate(orderNumber, totalAmount, 0, DateTime.Now, customerName, products);
+            return new OrderAggregate(orderNumber, totalAmount, 0, DateTime.Now, customerName, customerAddress, products);
         }
 
-
+        public void Update(string customerName, string customerAddress, List<ProductAggregate> products)
+        {
+            CustomerName = customerName;
+            CustomerAddress = customerAddress;
+            foreach (var product in products)
+            {
+                
+                var existingProduct = Products.FirstOrDefault(p => p.Id == product.Id);
+                if (existingProduct != null)
+                {
+                    existingProduct.Quantity = product.Quantity;
+                }
+                else
+                {
+                    Products.Add(product);
+                }
+            }
+        }
 
         private static string GenerateOrderNumber()
         {
@@ -53,22 +65,5 @@ namespace Domain.Model
             return new string(Enumerable.Repeat(chars, 8)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-
-       
-        public void Update(string customerName, List<ProductAggregate> products)
-        {
-            CustomerName = customerName;
-            Products = products;
-        }
-
-
-
-
-
-
     }
-
-
-
-
 }

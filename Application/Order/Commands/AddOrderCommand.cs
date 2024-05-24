@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Order.Commands
@@ -13,11 +13,13 @@ namespace Application.Order.Commands
     public class AddOrderCommand : IRequest<OrderAggregate>
     {
         public string CustomerName { get; set; }
+        public string CustomerAddress { get; set; } 
         public List<int> ProductIds { get; set; }
 
-        public AddOrderCommand(string customerName, List<int> productIds)
+        public AddOrderCommand(string customerName, string customerAddress, List<int> productIds)
         {
             CustomerName = customerName;
+            CustomerAddress = customerAddress;
             ProductIds = productIds;
         }
 
@@ -45,6 +47,7 @@ namespace Application.Order.Commands
                 var order = new OrderAggregate
                 {
                     CustomerName = request.CustomerName,
+                    CustomerAddress = request.CustomerAddress, 
                     TotalAmount = totalAmount,
                     DiscountAmount = 0,
                     OrderDate = DateTime.Now,

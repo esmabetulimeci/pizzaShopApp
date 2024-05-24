@@ -22,6 +22,7 @@ namespace Infrastructure.Persistence.Configuration
             builder.Property(o => o.DiscountAmount).HasColumnName("discount_amount").HasColumnType("decimal(18,2)");
             builder.Property(o => o.OrderDate).HasColumnName("order_date").HasColumnType("date");
             builder.Property(o => o.CustomerName).HasColumnName("customer_name").HasColumnType("varchar(250)");
+            builder.Property(o => o.CustomerAddress).HasColumnName("customer_address").HasColumnType("varchar(250)");
 
             builder.HasMany(o => o.Products).WithMany(p => p.Orders);
         }

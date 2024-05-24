@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Model;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,17 @@ namespace Application.Order.Commands
 {
     public class UpdateOrderCommand : IRequest<OrderAggregate>
     {
-        public int OrderId { get; set; }
-        public string UpdatedCustomerName { get; set; }
-        public int UpdatedProductId { get; set; }
+        public int OrderId { get; set; } 
+        public string CustomerName { get; set; }
+        public string CustomerAddress { get; set; }
+        public List<int> ProductIds { get; set; } 
 
-        public UpdateOrderCommand(int orderId, string updatedCustomerName, int updatedProductId)
+        public UpdateOrderCommand(int orderId, string customerName, string customerAddress, List<int> productIds)
         {
             OrderId = orderId;
-            UpdatedCustomerName = updatedCustomerName;
-            UpdatedProductId = updatedProductId;
+            CustomerName = customerName;
+            CustomerAddress = customerAddress;
+            ProductIds = productIds;
         }
     }
 
@@ -34,25 +37,37 @@ namespace Application.Order.Commands
 
         public async Task<OrderAggregate> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
         {
-            var order = await _dbContext.Orders.FindAsync(request.OrderId);
+            var order = await _dbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == request.OrderId);
+
             if (order == null)
             {
-                throw new Exception("ORDER_NOT_FOUND");
+                throw new Exception($"Order with ID {request.OrderId} not found.");
             }
 
-            var product = await _dbContext.Products.FindAsync(request.UpdatedProductId);
-            if (product == null)
+           
+            order.CustomerName = request.CustomerName;
+            order.CustomerAddress = request.CustomerAddress;
+
+        
+            order.Products.Clear();
+
+            foreach (var productId in request.ProductIds)
             {
-                throw new Exception("PRODUCT_NOT_FOUND");
+                var product = await _dbContext.Products.FindAsync(productId);
+                if (product == null)
+                {
+                    throw new Exception($"Product with ID {productId} not found.");
+                }
+                order.Products.Add(product);
             }
 
-            order.Update(request.UpdatedCustomerName, new List<ProductAggregate> { product });
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return order;
         }
-
-
     }
+
+
+
 
 }
