@@ -5,23 +5,21 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Order.Commands
 {
     public class UpdateOrderCommand : IRequest<OrderAggregate>
     {
-        public int OrderId { get; set; } 
-        public string CustomerName { get; set; }
-        public string CustomerAddress { get; set; }
-        public List<int> ProductIds { get; set; } 
+        public int OrderId { get; set; }
+        public int CustomerId { get; set; } // Müşteri kimliği
+        public List<int> ProductIds { get; set; }
 
-        public UpdateOrderCommand(int orderId, string customerName, string customerAddress, List<int> productIds)
+        public UpdateOrderCommand(int orderId, int customerId, List<int> productIds)
         {
             OrderId = orderId;
-            CustomerName = customerName;
-            CustomerAddress = customerAddress;
+            CustomerId = customerId;
             ProductIds = productIds;
         }
 
@@ -43,10 +41,13 @@ namespace Application.Order.Commands
                     throw new Exception($"Order with ID {request.OrderId} not found.");
                 }
 
+                var customer = await _dbContext.Customers.FindAsync(request.CustomerId);
+                if (customer == null)
+                {
+                    throw new Exception($"Customer with ID {request.CustomerId} not found.");
+                }
 
-                order.CustomerName = request.CustomerName;
-                order.CustomerAddress = request.CustomerAddress;
-
+                order.Customer = customer;
 
                 order.Products.Clear();
 
@@ -66,10 +67,4 @@ namespace Application.Order.Commands
             }
         }
     }
-
-   
-
-
-
-
 }

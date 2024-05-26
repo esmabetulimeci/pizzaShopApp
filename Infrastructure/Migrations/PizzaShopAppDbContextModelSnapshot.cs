@@ -24,7 +24,7 @@ namespace Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Model.OrderAggregate", b =>
+            modelBuilder.Entity("Domain.Model.CustomerAggregate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,37 +33,29 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CustomerAddress")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("varchar(250)")
-                        .HasColumnName("customer_address");
+                        .HasColumnName("address");
 
-                    b.Property<string>("CustomerName")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("varchar(250)")
-                        .HasColumnName("customer_name");
+                        .HasColumnName("email");
 
-                    b.Property<double>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("discount_amount");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("date")
-                        .HasColumnName("order_date");
-
-                    b.Property<string>("OrderNumber")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("order_number");
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("name");
 
-                    b.Property<double>("TotalAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("total_amount");
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("password");
 
                     b.HasKey("Id");
 
-                    b.ToTable("order", (string)null);
+                    b.ToTable("customer", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Model.ProductAggregate", b =>
@@ -108,6 +100,44 @@ namespace Infrastructure.Migrations
                     b.ToTable("product", (string)null);
                 });
 
+            modelBuilder.Entity("OrderAggregate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int")
+                        .HasColumnName("customer_id");
+
+                    b.Property<double>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_amount");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("date")
+                        .HasColumnName("order_date");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("order_number");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_amount");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("order", (string)null);
+                });
+
             modelBuilder.Entity("OrderAggregateProductAggregate", b =>
                 {
                     b.Property<int>("OrdersId")
@@ -120,12 +150,23 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("OrderAggregateProductAggregate");
+                    b.ToTable("OrderProduct", (string)null);
+                });
+
+            modelBuilder.Entity("OrderAggregate", b =>
+                {
+                    b.HasOne("Domain.Model.CustomerAggregate", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("OrderAggregateProductAggregate", b =>
                 {
-                    b.HasOne("Domain.Model.OrderAggregate", null)
+                    b.HasOne("OrderAggregate", null)
                         .WithMany()
                         .HasForeignKey("OrdersId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -136,6 +177,11 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Model.CustomerAggregate", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

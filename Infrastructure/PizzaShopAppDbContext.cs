@@ -15,6 +15,10 @@ namespace Infrastructure
     {
         public DbSet<ProductAggregate> Products { get; set; }
         public DbSet<OrderAggregate> Orders { get; set; }
+
+        public DbSet<CustomerAggregate> Customers { get; set; }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new NpgsqlDataSourceBuilder("Server=localhost;Port=5432;Database=pizzaShopApp;Userid=postgres;Password=123123;Include Error Detail=True;");

@@ -6,13 +6,12 @@ namespace pizzaShopApi.Models.Order
 {
     public class CreateOrderRequest
     {
-        public string CustomerName { get; set; }
-        public string CustomerAddress { get; set; } // Müşteri adresi eklendi
+        public int CustomerId { get; set; }
         public List<int> ProductIds { get; set; }
 
         public AddOrderCommand ToCommand()
         {
-            return new AddOrderCommand(CustomerName, CustomerAddress, ProductIds); // Müşteri adresi eklenerek komut oluşturuluyor
+            return new AddOrderCommand(CustomerId, ProductIds);
         }
     }
 }

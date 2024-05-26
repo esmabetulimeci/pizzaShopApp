@@ -15,20 +15,19 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "order",
+                name: "customer",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    order_number = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    total_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
-                    discount_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
-                    order_date = table.Column<DateTime>(type: "date", nullable: false),
-                    customer_name = table.Column<string>(type: "varchar(250)", nullable: false)
+                    name = table.Column<string>(type: "varchar(250)", nullable: false),
+                    password = table.Column<string>(type: "varchar(250)", nullable: false),
+                    email = table.Column<string>(type: "varchar(250)", nullable: false),
+                    address = table.Column<string>(type: "varchar(250)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_order", x => x.id);
+                    table.PrimaryKey("PK_customer", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,7 +49,30 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderAggregateProductAggregate",
+                name: "order",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    order_number = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    total_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
+                    discount_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
+                    order_date = table.Column<DateTime>(type: "date", nullable: false),
+                    customer_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_order_customer_customer_id",
+                        column: x => x.customer_id,
+                        principalTable: "customer",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderProduct",
                 columns: table => new
                 {
                     OrdersId = table.Column<int>(type: "int", nullable: false),
@@ -58,15 +80,15 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderAggregateProductAggregate", x => new { x.OrdersId, x.ProductsId });
+                    table.PrimaryKey("PK_OrderProduct", x => new { x.OrdersId, x.ProductsId });
                     table.ForeignKey(
-                        name: "FK_OrderAggregateProductAggregate_order_OrdersId",
+                        name: "FK_OrderProduct_order_OrdersId",
                         column: x => x.OrdersId,
                         principalTable: "order",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderAggregateProductAggregate_product_ProductsId",
+                        name: "FK_OrderProduct_product_ProductsId",
                         column: x => x.ProductsId,
                         principalTable: "product",
                         principalColumn: "int",
@@ -74,8 +96,13 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderAggregateProductAggregate_ProductsId",
-                table: "OrderAggregateProductAggregate",
+                name: "IX_order_customer_id",
+                table: "order",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderProduct_ProductsId",
+                table: "OrderProduct",
                 column: "ProductsId");
         }
 
@@ -83,13 +110,16 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderAggregateProductAggregate");
+                name: "OrderProduct");
 
             migrationBuilder.DropTable(
                 name: "order");
 
             migrationBuilder.DropTable(
                 name: "product");
+
+            migrationBuilder.DropTable(
+                name: "customer");
         }
     }
 }

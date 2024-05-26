@@ -1,25 +1,23 @@
-﻿using Application.Common.Interfaces;
-using Domain.Model;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Common.Interfaces;
+using Domain.Model;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Order.Commands
 {
     public class AddOrderCommand : IRequest<OrderAggregate>
     {
-        public string CustomerName { get; set; }
-        public string CustomerAddress { get; set; } 
+        public int CustomerId { get; set; } // Müşteri kimliği
         public List<int> ProductIds { get; set; }
 
-        public AddOrderCommand(string customerName, string customerAddress, List<int> productIds)
+        public AddOrderCommand(int customerId, List<int> productIds)
         {
-            CustomerName = customerName;
-            CustomerAddress = customerAddress;
+            CustomerId = customerId;
             ProductIds = productIds;
         }
 
@@ -34,25 +32,30 @@ namespace Application.Order.Commands
 
             public async Task<OrderAggregate> Handle(AddOrderCommand request, CancellationToken cancellationToken)
             {
-                var products = await _dbContext.Products.Where(p => request.ProductIds.Contains(p.Id)).ToListAsync();
-                if (products.Count != request.ProductIds.Count)
+                var customer = await _dbContext.Customers
+                    .Include(x => x.Orders)
+                    .FirstOrDefaultAsync(x => x.Id == request.CustomerId, cancellationToken);
+
+                if (customer == null)
                 {
-                    throw new Exception("One or more products not found");
+                    throw new Exception("Müşteri bulunamadı.");
                 }
 
-                double totalAmount = products.Sum(p => p.Price);
+                var products = await _dbContext.Products
+                    .Where(x => request.ProductIds.Contains(x.Id))
+                    .ToListAsync(cancellationToken);
 
-                string orderNumber = GenerateOrderNumber();
+                if (products.Count != request.ProductIds.Count)
+                {
+                    throw new Exception("Ürünlerden biri bulunamadı.");
+                }
 
                 var order = new OrderAggregate
                 {
-                    CustomerName = request.CustomerName,
-                    CustomerAddress = request.CustomerAddress, 
-                    TotalAmount = totalAmount,
-                    DiscountAmount = 0,
-                    OrderDate = DateTime.Now,
-                    OrderNumber = orderNumber,
-                    Products = products
+                    OrderNumber = GenerateOrderNumber(),
+                    Customer = customer,
+                    Products = products,
+                    OrderDate = DateTime.Now
                 };
 
                 _dbContext.Orders.Add(order);
@@ -60,6 +63,9 @@ namespace Application.Order.Commands
 
                 return order;
             }
+
+
+
 
             private string GenerateOrderNumber()
             {
