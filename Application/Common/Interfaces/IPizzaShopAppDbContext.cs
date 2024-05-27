@@ -12,8 +12,10 @@ namespace Application.Common.Interfaces
     {
         DbSet<ProductAggregate> Products { get; set; }
         DbSet<OrderAggregate> Orders { get; set; }
+        DbSet<UserAggregate> Users { get; set; }
+        DbSet<AddressAggregate> Addresses { get; set; }
 
-        DbSet<CustomerAggregate> Customers { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

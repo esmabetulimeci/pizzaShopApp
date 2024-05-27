@@ -1,4 +1,4 @@
-﻿using Application.Order.Commands;
+﻿using Application.Operations.Order.Commands;
 using Domain.Model;
 using System.Collections.Generic;
 
@@ -6,12 +6,17 @@ namespace pizzaShopApi.Models.Order
 {
     public class CreateOrderRequest
     {
-        public int CustomerId { get; set; }
+
+        public int UserId { get; set; }
+        public int AddressId { get; set; }
         public List<int> ProductIds { get; set; }
+
 
         public AddOrderCommand ToCommand()
         {
-            return new AddOrderCommand(CustomerId, ProductIds);
+            return new AddOrderCommand(UserId, AddressId, ProductIds);
         }
+
+
     }
 }

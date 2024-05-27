@@ -1,5 +1,5 @@
-﻿using Application.Order.Commands;
-using Application.Order.Queries;
+﻿using Application.Operations.Order.Commands;
+using Application.Operations.Order.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

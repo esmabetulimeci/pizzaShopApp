@@ -1,5 +1,5 @@
-﻿using Application.Product.Commands;
-using Application.Product.Queries;
+﻿using Application.Operations.Product.Commands;
+using Application.Operations.Product.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

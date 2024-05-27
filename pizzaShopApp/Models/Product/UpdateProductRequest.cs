@@ -1,4 +1,4 @@
-﻿using Application.Product.Commands;
+﻿using Application.Operations.Product.Commands;
 using Domain.Model;
 
 namespace pizzaShopApi.Models.Product

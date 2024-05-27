@@ -15,9 +15,8 @@ namespace Infrastructure
     {
         public DbSet<ProductAggregate> Products { get; set; }
         public DbSet<OrderAggregate> Orders { get; set; }
-
-        public DbSet<CustomerAggregate> Customers { get; set; }
-
+        public DbSet<UserAggregate> Users { get; set; }
+        public DbSet<AddressAggregate> Addresses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
