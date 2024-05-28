@@ -41,6 +41,7 @@ namespace Infrastructure.Migrations
                     first_name = table.Column<string>(type: "varchar(30)", nullable: false),
                     last_name = table.Column<string>(type: "varchar(30)", nullable: false),
                     email = table.Column<string>(type: "varchar(50)", nullable: false),
+                    password = table.Column<string>(type: "varchar(50)", nullable: false),
                     created_date = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>

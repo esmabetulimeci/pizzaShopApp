@@ -1,8 +1,9 @@
-﻿using Application.Operations.User.Queries;
+﻿
+using Application.Operations.User.Commands;
+using Application.Operations.User.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using pizzaShopApi.Models.User;
 
 namespace pizzaShopApi.Controllers
 {
@@ -17,15 +18,6 @@ namespace pizzaShopApi.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
-        {
-            var command = request.ToCommand();
-            var user = await _mediator.Send(command);
-
-            return Ok(user);
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
@@ -33,29 +25,33 @@ namespace pizzaShopApi.Controllers
             return Ok(users);
         }
 
-        //[HttpGet("{userId}")]
-        //public async Task<IActionResult> GetUser(int userId)
-        //{
-        //    var user = await _mediator.Send(new GetUserByIdQuery(userId));
-        //    return Ok(user);
-        //}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            return Ok(user);
+        }
 
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
-        //{
-        //    var command = request.ToCommand();
-        //    var user = await _mediator.Send(command);
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser(UpdateUserCommand command)
+        {
+            var updatedUser = await _mediator.Send(command);
+            return Ok(updatedUser);
+        }
 
-        //    return Ok(user);
-        //}
 
-        //[HttpDelete("{userId}")]
-        //public async Task<IActionResult> DeleteUser(int userId)
-        //{
-        //    var command = new DeleteUserCommand(userId);
-        //    await _mediator.Send(command);
+        [HttpDelete("{id}")]
 
-        //    return Ok();
-        //}
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var deletedUserId = await _mediator.Send(new DeleteUserCommand(id));
+            return Ok(deletedUserId);
+        }
+
+
+
+
+
+
     }
 }

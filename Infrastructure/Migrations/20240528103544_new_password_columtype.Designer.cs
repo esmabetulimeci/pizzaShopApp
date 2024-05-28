@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(PizzaShopAppDbContext))]
-    [Migration("20240526233943_init")]
-    partial class init
+    [Migration("20240528103544_new_password_columtype")]
+    partial class new_password_columtype
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -130,6 +130,11 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(30)")
                         .HasColumnName("last_name");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("password");
 
                     b.HasKey("Id");
 

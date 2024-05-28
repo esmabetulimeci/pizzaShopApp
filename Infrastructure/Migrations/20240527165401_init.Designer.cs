@@ -5,6 +5,7 @@ using Domain.Model;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(PizzaShopAppDbContext))]
-    partial class PizzaShopAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527165401_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,22 +118,22 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("email");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("last_name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("password");
 
                     b.HasKey("Id");

@@ -33,9 +33,5 @@ namespace Application.Operations.User.Queries
             }
         }
 
-
-
-
-
     }
 }

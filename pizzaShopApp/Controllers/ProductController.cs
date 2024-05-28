@@ -1,6 +1,7 @@
 ﻿using Application.Operations.Product.Commands;
 using Application.Operations.Product.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using pizzaShopApi.Models.Product;
@@ -26,6 +27,7 @@ namespace pizzaShopApi.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
         public async Task<IActionResult> Get()

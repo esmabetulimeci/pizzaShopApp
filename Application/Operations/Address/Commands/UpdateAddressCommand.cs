@@ -9,23 +9,20 @@ using System.Threading.Tasks;
 
 namespace Application.Operations.Address.Commands
 {
-    public class AddAddressCommand : IRequest<AddressAggregate>
+    public class UpdateAddressCommand : IRequest<AddressAggregate>
     {
-
-
-
+        public int Id { get; set; }
         public string AddressTitle { get; set; }
         public string Address { get; set; }
-        public int UserId { get; set; }
 
-        public AddAddressCommand(string addressTitle, string address, int userId)
+        public UpdateAddressCommand(int id, string addressTitle, string address)
         {
+            Id = id;
             AddressTitle = addressTitle;
             Address = address;
-            UserId = userId;
         }
 
-        public class Handler : IRequestHandler<AddAddressCommand, AddressAggregate>
+        public class Handler : IRequestHandler<UpdateAddressCommand, AddressAggregate>
         {
             private readonly IPizzaShopAppDbContext _dbContext;
 
@@ -34,18 +31,20 @@ namespace Application.Operations.Address.Commands
                 _dbContext = dbContext;
             }
 
-            public async Task<AddressAggregate> Handle(AddAddressCommand request, CancellationToken cancellationToken)
+            public async Task<AddressAggregate> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
             {
-                var user = await _dbContext.Users.FindAsync(request.UserId);
-                if (user == null)
+                var address = await _dbContext.Addresses.FindAsync(request.Id);
+                if (address == null)
                 {
-                    throw new Exception("USER_NOT_FOUND");
+                    throw new Exception("ADDRESS_NOT_FOUND");
                 }
-                var address = AddressAggregate.Create(request.AddressTitle, request.Address, user);
-                _dbContext.Addresses.Add(address);
+                address.Update(request.AddressTitle, request.Address);
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 return address;
             }
+
+
         }
     }
+  
 }
