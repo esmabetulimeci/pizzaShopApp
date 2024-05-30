@@ -1,9 +1,11 @@
-﻿using Application.Operations.Order.Commands;
+﻿using Application.Common.Interfaces.Redis;
+using Application.Operations.Order.Commands;
 using Application.Operations.Order.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using pizzaShopApi.Models.Order;
+using pizzaShopApi.Models.Order.Request;
+using System.Threading.Tasks;
 
 namespace pizzaShopApi.Controllers
 {
@@ -12,10 +14,12 @@ namespace pizzaShopApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IRedisDbContext _redisDbContext;
 
-        public OrderController(IMediator mediator)
+        public OrderController(IMediator mediator, IRedisDbContext redisDbContext)
         {
             _mediator = mediator;
+            _redisDbContext = redisDbContext;
         }
 
         [HttpPost]
@@ -24,20 +28,29 @@ namespace pizzaShopApi.Controllers
             var command = request.ToCommand();
             var order = await _mediator.Send(command);
 
+            await _redisDbContext.Delete("orders");
+
             return Ok(order);
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetOrders()
         {
+            var cacheKey = "orders";
+            var cacheValue = await _redisDbContext.Get<List<OrderAggregate>>(cacheKey);
+
+            if (cacheValue is not null)
+            {
+                return Ok(cacheValue);
+            }
+
             var orders = await _mediator.Send(new GetOrderQuery());
+            await _redisDbContext.Add(cacheKey, orders);
+
             return Ok(orders);
         }
 
         [HttpGet("{orderId}")]
-
         public async Task<IActionResult> GetOrder(int orderId)
         {
             var order = await _mediator.Send(new GetOrderByIdQuery(orderId));
@@ -49,6 +62,8 @@ namespace pizzaShopApi.Controllers
         {
             var command = request.ToCommand();
             var order = await _mediator.Send(command);
+            var cacheKey = $"order_{order.Id}";
+            await _redisDbContext.Delete(cacheKey);
 
             return Ok(order);
         }
@@ -59,12 +74,11 @@ namespace pizzaShopApi.Controllers
             var command = new DeleteOrderCommand(orderId);
             await _mediator.Send(command);
 
+            var cacheKey = $"order_{orderId}";
+            await _redisDbContext.Delete(cacheKey);
+            await _redisDbContext.Delete("orders");
+
             return Ok();
         }
-
-
-
-
-
     }
 }

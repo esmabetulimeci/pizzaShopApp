@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Application.Operations.Auth;
+﻿using Application.Common.Interfaces.Jwt;
+using Application.Operations.Auth.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

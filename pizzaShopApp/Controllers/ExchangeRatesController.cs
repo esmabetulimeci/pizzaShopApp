@@ -1,4 +1,4 @@
-﻿using Application.Services;
+﻿using Application.Services.ExchangeRate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Domain.Model;
-using Infrastructure;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

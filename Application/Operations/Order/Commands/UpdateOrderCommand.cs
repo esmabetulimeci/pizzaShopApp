@@ -1,5 +1,4 @@
-﻿
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Domain.Model;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

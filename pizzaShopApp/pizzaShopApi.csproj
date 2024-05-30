@@ -23,4 +23,11 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Auth\Response\" />
+    <Folder Include="Models\Notification\Response\" />
+    <Folder Include="Models\Order\Response\" />
+    <Folder Include="Models\Product\Response\" />
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,12 @@
-﻿using Application.Operations.Address.Commands;
+﻿using Application.Common.Interfaces.Redis;
+using Application.Operations.Address.Commands;
 using Application.Operations.Address.Queries;
+using Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using pizzaShopApi.Models.Address;
+using pizzaShopApi.Models.Address.Request;
+using System.Threading.Tasks;
 
 namespace pizzaShopApi.Controllers
 {
@@ -11,35 +14,37 @@ namespace pizzaShopApi.Controllers
     [ApiController]
     public class AddressController : ControllerBase
     {
-
         private readonly IMediator _mediator;
+        private readonly IRedisDbContext _redisDbContext;
 
-        public AddressController(IMediator mediator)
+        public AddressController(IMediator mediator, IRedisDbContext redisDbContext)
         {
             _mediator = mediator;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddAddress([FromBody] CreateAddressRequest request)
-        {
-            var command = request.ToCommand();
-            var address = await _mediator.Send(command);
-            return Ok(address);
+            _redisDbContext = redisDbContext;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAddresses()
         {
-            var query = new GetAddressQuery();
-            var addresses = await _mediator.Send(query);
+            var cacheKey = "addresses";
+            var cacheValue = await _redisDbContext.Get<List<AddressAggregate>>(cacheKey);
+
+            if (cacheValue is not null)
+            {
+                return Ok(cacheValue);
+            }
+
+            var addresses = await _mediator.Send(new GetAddressQuery());
+
+            await _redisDbContext.Add(cacheKey, addresses);
+
             return Ok(addresses);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddress(int id)
         {
-            var query = new GetAddressByIdQuery(id);
-            var address = await _mediator.Send(query);
+            var address = await _mediator.Send(new GetAddressByIdQuery(id));
             return Ok(address);
         }
 
@@ -48,15 +53,23 @@ namespace pizzaShopApi.Controllers
         {
             var command = request.ToCommand();
             var address = await _mediator.Send(command);
+
+            var cacheKey = $"address_{id}";
+            await _redisDbContext.Delete(cacheKey);
+
             return Ok(address);
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAddress(int id)
         {
             var command = new DeleteAddressCommand(id);
             await _mediator.Send(command);
+
+            var cacheKey = $"address_{id}";
+            await _redisDbContext.Delete(cacheKey);
+            await _redisDbContext.Delete("addresses");
+
             return Ok();
         }
     }
