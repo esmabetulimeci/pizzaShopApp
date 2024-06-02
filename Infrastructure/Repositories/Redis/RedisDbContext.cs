@@ -38,11 +38,14 @@ namespace Infrastructure.Repositories.Redis
 
         public async Task Add<T>(string key, T value, int time = 1)
         {
-            var jsonValue = JsonSerializer.Serialize(value);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
 
-            var timeSpan = TimeSpan.FromMinutes(time);
+            var json = JsonSerializer.Serialize(value, options);
 
-            await _database.StringSetAsync(key, jsonValue, timeSpan);
+            await _database.StringSetAsync(key, json, TimeSpan.FromHours(time));
         }
 
         public async Task Delete(string key)

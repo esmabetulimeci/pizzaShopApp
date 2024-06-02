@@ -26,9 +26,9 @@ namespace Infrastructure.Repositories.MailProviders
                 default:
                     break;
             }
-
-
             return provider;
+
+
         }
     }
 }

@@ -59,12 +59,8 @@ namespace Application.Operations.Auth.Commands
                     throw new Exception("INVALID_PASSWORD");
                 }
 
-                // Kullanıcı doğrulandı, JWT token oluşturulur
                 var token = _jwtService.GenerateJwtToken(user);
-                return user;
-
-                // Oluşturulan token kullanıcıya dönülür
-                // Bu örnekte token'ın sadece string formatında dönüldüğünü varsayalım
+                return user;    
 
             }
 

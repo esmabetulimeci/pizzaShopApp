@@ -13,6 +13,9 @@ using Application.Common.Interfaces;
 using Infrastructure.Repositories;
 using Application.Common.Interfaces.Auth;
 using Application.Services.Auth;
+using MassTransit;
+using Domain.Model;
+using Infrastructure.RabbitMQ.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +49,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
     };
 });
+
+builder.Services.AddMassTransit(bus =>
+{
+    bus.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost");
+
+        cfg.ReceiveEndpoint("update-order-queue", e =>
+        {
+            e.Consumer<UpdateOrderConsumer>(context);
+        });
+    });
+
+
+});
+
+
+
+
 
 
 var app = builder.Build();

@@ -28,6 +28,7 @@
     <Folder Include="Models\Notification\Response\" />
     <Folder Include="Models\Order\Response\" />
     <Folder Include="Models\Product\Response\" />
+    <Folder Include="Models\Users\Request\" />
   </ItemGroup>
 
 </Project>

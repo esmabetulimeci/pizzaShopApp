@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Redis;
 using Application.Operations.User.Commands;
 using Application.Operations.User.Queries;
+using Application.Operations.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,30 +32,32 @@ namespace pizzaShopApi.Controllers
         {
             var cacheKey = "users";
 
-            var cacheValue = await _redisDbContext.Get<List<GetUserResponse>>(cacheKey);
+            var cacheValue = await _redisDbContext.Get<IEnumerable<GetUserResponse>>(cacheKey);
 
-            if (cacheValue != null)
+            if (cacheValue is not null)
             {
                 return Ok(cacheValue);
             }
 
-            var query = new GetUserQuery();
+            var query = new GetUsersQuery();
             var result = await _mediator.Send(query, token);
-            var response = result.Select(x => new GetUserResponse
+
+            var response = result.Select(u => new GetUserResponse
             {
-                Id = x.Id,
-                Email = x.Email,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                CreatedDate = x.CreatedDate,
-                Addresses = x.Addresses.Select(a => new GetAddressResponse
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                CreatedDate = u.CreatedDate,
+                Addresses = u.Addresses.Select(a => new GetAddressResponse
                 {
                     Id = a.Id,
                     AddressTitle = a.AddressTitle,
                     Address = a.Address,
                     CreatedDate = a.CreatedDate
                 }).ToList()
-            }).ToList();
+            });
+
             await _redisDbContext.Add(cacheKey, response);
 
             return Ok(response);

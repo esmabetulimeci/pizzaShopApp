@@ -8,13 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Operations.User.Queries
+namespace Application.Operations.Users.Queries
 {
-    public class GetUserQuery : IRequest<IEnumerable<UserAggregate>>
+    public class GetUsersQuery : IRequest<IEnumerable<UserAggregate>>
     {
-
-
-        public class Handler : IRequestHandler<GetUserQuery, IEnumerable<UserAggregate>>
+        public class Handler : IRequestHandler<GetUsersQuery, IEnumerable<UserAggregate>>
         {
             private readonly IPizzaShopAppDbContext _dbContext;
 
@@ -23,7 +21,7 @@ namespace Application.Operations.User.Queries
                 _dbContext = dbContext;
             }
 
-            public async Task<IEnumerable<UserAggregate>> Handle(GetUserQuery request, CancellationToken cancellationToken)
+            public async Task<IEnumerable<UserAggregate>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
             {
                 var users = await _dbContext.Users.ToListAsync();
                 if (users == null)
@@ -32,8 +30,8 @@ namespace Application.Operations.User.Queries
                 }
                 return users;
             }
-
         }
 
     }
+
 }
