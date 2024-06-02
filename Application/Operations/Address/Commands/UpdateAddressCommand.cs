@@ -36,7 +36,7 @@ namespace Application.Operations.Address.Commands
                 var address = await _dbContext.Addresses.FindAsync(request.Id);
                 if (address == null)
                 {
-                    throw new Exception("ADDRESS_NOT_FOUND");
+                    throw new Exception("Adres Bulunamadı.");
                 }
                 address.Update(request.AddressTitle, request.Address);
                 await _dbContext.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using Application.Operations.Auth;
+using Application.Operations.Auth.Commands;
 
 namespace pizzaShopApi.Models.Auth.Request
 {
@@ -10,6 +11,12 @@ namespace pizzaShopApi.Models.Auth.Request
         public string Email { get; set; }
 
         public string Password { get; set; }
+
+
+        public RegisterCommand ToCommand()
+        {
+            return new RegisterCommand(FirstName, LastName, Email, Password);
+        }
 
 
 

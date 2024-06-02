@@ -36,9 +36,8 @@ namespace pizzaShopApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrders()
         {
-            var cacheKey = "orders";
-            var cacheValue = await _redisDbContext.Get<List<OrderAggregate>>(cacheKey);
-
+            string cacheKey = "orders";
+            var cacheValue = await _redisDbContext.Get<OrderAggregate[]>(cacheKey);
             if (cacheValue is not null)
             {
                 return Ok(cacheValue);
@@ -46,14 +45,21 @@ namespace pizzaShopApi.Controllers
 
             var orders = await _mediator.Send(new GetOrderQuery());
             await _redisDbContext.Add(cacheKey, orders);
-
             return Ok(orders);
         }
 
         [HttpGet("{orderId}")]
         public async Task<IActionResult> GetOrder(int orderId)
         {
+            string cacheKey = $"order_{orderId}";
+            var cacheValue = await _redisDbContext.Get<OrderAggregate>(cacheKey);
+            if (cacheValue is not null)
+            {
+                return Ok(cacheValue);
+            }
+
             var order = await _mediator.Send(new GetOrderByIdQuery(orderId));
+            await _redisDbContext.Add(cacheKey, order);
             return Ok(order);
         }
 

@@ -29,7 +29,6 @@ namespace pizzaShopApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers(CancellationToken token)
         {
-
             var cacheKey = "users";
 
             var cacheValue = await _redisDbContext.Get<List<GetUserResponse>>(cacheKey);
@@ -41,20 +40,20 @@ namespace pizzaShopApi.Controllers
 
             var query = new GetUserQuery();
             var result = await _mediator.Send(query, token);
-            var response = result.Select(x=> new GetUserResponse
+            var response = result.Select(x => new GetUserResponse
             {
                 Id = x.Id,
                 Email = x.Email,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 CreatedDate = x.CreatedDate,
-              Addresses = x.Addresses.Select(a => new GetAddressResponse
-              {
-                  Id = a.Id,
-                  AddressTitle = a.AddressTitle,
-                  Address = a.Address,
-                  CreatedDate = a.CreatedDate
-              }).ToList()
+                Addresses = x.Addresses.Select(a => new GetAddressResponse
+                {
+                    Id = a.Id,
+                    AddressTitle = a.AddressTitle,
+                    Address = a.Address,
+                    CreatedDate = a.CreatedDate
+                }).ToList()
             }).ToList();
             await _redisDbContext.Add(cacheKey, response);
 
@@ -124,24 +123,6 @@ namespace pizzaShopApi.Controllers
 
             return Ok("Kullanıcı Başarıyla Silindi.");
         }
-
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [HttpPost("{id}/addresses")]
-        public async Task<IActionResult> CreateAddress([FromRoute] int id, [FromBody] CreateAddressRequest request, CancellationToken token)
-        {
-            var command = request.ToCommand(id);
-            await _mediator.Send(command, token);
-
-            var cacheKey = $"user_{id}";
-            await _redisDbContext.Delete(cacheKey);
-
-            return Ok("Adres Başarıyla Oluşturuldu.");
-        }
-
-
-
-
-
 
 
     }

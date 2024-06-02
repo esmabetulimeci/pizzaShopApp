@@ -11,6 +11,8 @@ using Application.Common.Interfaces.Redis;
 using Infrastructure.Repositories.Redis;
 using Application.Common.Interfaces;
 using Infrastructure.Repositories;
+using Application.Common.Interfaces.Auth;
+using Application.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<IPizzaShopAppDbContext, PizzaShopAppDbContext>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRedisDbContext, RedisDbContext>();
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(IPizzaShopAppDbContext).Assembly));
 builder.Services.AddControllers().AddJsonOptions(options =>

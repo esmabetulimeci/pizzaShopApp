@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces.Auth;
+using Domain.Model;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -7,34 +9,44 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Application.Common.Interfaces.Auth.IAuthService;
 
 namespace Application.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private readonly string _jwtSecret;
+        private readonly IConfiguration _configration;
 
-        public AuthService(string jwtSecret)
+        public AuthService(IConfiguration configration)
         {
-            _jwtSecret = jwtSecret;
+            _configration = configration;
         }
-        public async Task<string> SignIn(string email, string password)
+
+        public async Task<AccessToken> CreateAccessToken(UserAggregate user)
         {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configration["Jwt:Key"]));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSecret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new[]
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, email)
-                }),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                new Claim("user_id", user.Id.ToString()),
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
 
-            return tokenString;
+            var token = new JwtSecurityToken(
+                issuer: _configration["Jwt:Issuer"],
+                audience: _configration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(Convert.ToInt32(_configration["Jwt:Expiration"])),
+                signingCredentials: credentials
+            );
+
+            var accessToken = new AccessToken
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo
+            };
+
+            return await Task.FromResult(accessToken);
         }
     }
 }

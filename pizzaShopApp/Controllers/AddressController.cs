@@ -23,8 +23,21 @@ namespace pizzaShopApi.Controllers
             _redisDbContext = redisDbContext;
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost]
+        public async Task<IActionResult> CreateAddress([FromBody] CreateAddressRequest request)
+        {
+            var command = request.ToCommand();
+            var address = await _mediator.Send(command);
+
+            await _redisDbContext.Delete("addresses");
+
+            return Ok(address);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetAddresses()
+        public async Task<IActionResult> GetAddresses(string searchKeyword) // Burada searchKeyword parametresi ekleniyor
         {
             var cacheKey = "addresses";
             var cacheValue = await _redisDbContext.Get<List<AddressAggregate>>(cacheKey);
@@ -34,8 +47,7 @@ namespace pizzaShopApi.Controllers
                 return Ok(cacheValue);
             }
 
-            var addresses = await _mediator.Send(new GetAddressQuery());
-
+            var addresses = await _mediator.Send(new GetAddressQuery { SearchKeyword = searchKeyword }); // SearchKeyword parametresi istemciden alınan metinle dolduruluyor
             await _redisDbContext.Add(cacheKey, addresses);
 
             return Ok(addresses);

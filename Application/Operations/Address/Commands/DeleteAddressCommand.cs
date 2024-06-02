@@ -31,7 +31,7 @@ namespace Application.Operations.Address.Commands
                 var address = await _dbContext.Addresses.FindAsync(request.Id);
                 if (address == null)
                 {
-                    throw new Exception("ADDRESS_NOT_FOUND");
+                    throw new Exception("Adres Bulunamadı.");
                 }
                 _dbContext.Addresses.Remove(address);
                 await _dbContext.SaveChangesAsync(cancellationToken);

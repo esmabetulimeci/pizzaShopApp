@@ -16,11 +16,14 @@ namespace Application.Operations.Order.Commands
         public int AddressId { get; set; } // Adres kimliği
         public List<int> ProductIds { get; set; }
 
-        public CreateOrderCommand(int userId, int addressId, List<int> productIds)
+        public string CustomerName { get; set; }
+
+        public CreateOrderCommand(int userId, int addressId, List<int> productIds, string customerName)
         {
             UserId = userId;
             AddressId = addressId;
             ProductIds = productIds;
+            CustomerName = customerName;
         }
 
         public class AddOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderAggregate>

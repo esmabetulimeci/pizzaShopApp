@@ -1,38 +1,56 @@
-﻿using Application.Common.Interfaces.Jwt;
-using Application.Operations.Auth.Commands;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Redis;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using pizzaShopApi.Models.Auth.Request;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace pizzaShopApi.Controllers
+
+namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IJwtService _jwtService;
         private readonly IMediator _mediator;
+        private readonly IRedisDbContext _redisClient;
 
-        public AuthController(IJwtService jwtService, IMediator mediator)
+        public AuthController(IMediator mediator, IRedisDbContext redisClient = null)
         {
-            _jwtService = jwtService;
             _mediator = mediator;
+            _redisClient = redisClient;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterCommand command)
-        {
-            await _mediator.Send(command);
-            return Ok("Kaydınız tamamlandı");
-        }
-
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginCommand command)
+        public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken token)
         {
-            var user = await _mediator.Send(command);
-            var token = _jwtService.GenerateJwtToken(user);
-            return Ok(new { token });
+            var command = request.ToCommand();
+            var result = await _mediator.Send(command, token);
+
+            return Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] pizzaShopApi.Models.Auth.Request.RegisterRequest request, CancellationToken token)
+        {
+            var command = request.ToCommand();
+            var result = await _mediator.Send(command, token);
+
+            return Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+
+            return Ok("Çıkış işlemi başarılı.");
         }
     }
 }

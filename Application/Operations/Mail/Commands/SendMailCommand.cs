@@ -40,7 +40,8 @@ namespace Application.Operations.Mail.Commands
                     throw new Exception("PROVIDER_NOT_FOUND");
                 }
 
-                await provider.Send(request.Settings, request.Definition, request.Subject);
+                //await provider.SendMail(request.Subject, request.Definition);
+
 
                 return Unit.Value;
             }

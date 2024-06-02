@@ -14,5 +14,10 @@ namespace Infrastructure.Repositories.MailProviders
         {
             throw new NotImplementedException();
         }
+
+        public Task Send(Settings settings, string messageString, string titleString, string address)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

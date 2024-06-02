@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Jwt;
+using Application.Common.Interfaces.Redis;
+using Application.Operations.Auth.Validators;
 using Domain.Model;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +28,13 @@ namespace Application.Operations.Auth.Commands
         {
             private readonly IPizzaShopAppDbContext _dbContext;
             private readonly IJwtService _jwtService;
+            private readonly IRedisDbContext _redisDbContext;
 
-            public Handler(IPizzaShopAppDbContext dbContext, IJwtService jwtService)
+            public Handler(IPizzaShopAppDbContext dbContext, IJwtService jwtService , IRedisDbContext redisDbContext )
             {
                 _dbContext = dbContext;
                 _jwtService = jwtService;
+                _redisDbContext = redisDbContext;
             }
 
             public async Task<UserAggregate> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -40,6 +44,14 @@ namespace Application.Operations.Auth.Commands
                 {
                     throw new Exception("USER_NOT_FOUND");
                 }
+
+                var validator = new CreateLoginValidator();
+                var validationResult = validator.Validate(request);
+                if (!validationResult.IsValid)
+                {
+                    throw new Exception("INVALID_REQUEST");
+                }
+
 
                 var hashedPassword = HashPassword(request.Password);
                 if (user.Password != hashedPassword)

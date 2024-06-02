@@ -33,6 +33,21 @@ namespace Domain.Model
         public virtual List<AddressAggregate> Addresses { get; set; }
         public virtual List<OrderAggregate> Orders { get; }
 
+        public static UserAggregate Create(string firstName, string lastName, string email, string password)
+        {
+            return new UserAggregate(firstName, lastName, email, password);
+        }
+
+        public UserAggregate Update(string firstName, string lastName, string email, string password)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Password = HashPassword(password);
+
+            return this;
+        }
+
 
         // Parolanın hashlenmiş halini hesaplayan yardımcı metot
         private string HashPassword(string password)

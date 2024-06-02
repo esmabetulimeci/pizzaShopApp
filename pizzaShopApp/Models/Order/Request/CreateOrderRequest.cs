@@ -11,10 +11,12 @@ namespace pizzaShopApi.Models.Order.Request
         public int AddressId { get; set; }
         public List<int> ProductIds { get; set; }
 
+        public string customerName { get; set; }
+
 
         public CreateOrderCommand ToCommand()
         {
-            return new CreateOrderCommand(UserId, AddressId, ProductIds);
+            return new CreateOrderCommand(UserId, AddressId, ProductIds, customerName);
         }
 
 

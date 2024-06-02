@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,13 @@ namespace Application.Common.Interfaces.Auth
 {
     public interface IAuthService
     {
-        Task<string> SignIn(string email, string password);
+        public class AccessToken
+        {
+            public string Token { get; set; }
+            public DateTime Expiration { get; set; }
+        }
+        public Task<AccessToken> CreateAccessToken(UserAggregate user);
+
+
     }
 }
